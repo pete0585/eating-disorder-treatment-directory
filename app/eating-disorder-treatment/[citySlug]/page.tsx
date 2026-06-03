@@ -6,6 +6,26 @@ import ListingCard from '@/components/ListingCard'
 import { getListingsByCity } from '@/lib/data'
 import { parseCitySlug, formatState } from '@/lib/utils'
 
+export async function generateStaticParams() {
+  return [
+    { citySlug: 'denver-co' },
+    { citySlug: 'tucson-az' },
+    { citySlug: 'chicago-il' },
+    { citySlug: 'san-diego-ca' },
+    { citySlug: 'tampa-fl' },
+    { citySlug: 'houston-tx' },
+    { citySlug: 'colorado-springs-co' },
+    { citySlug: 'charlotte-nc' },
+    { citySlug: 'philadelphia-pa' },
+    { citySlug: 'jacksonville-fl' },
+    { citySlug: 'atlanta-ga' },
+    { citySlug: 'portland-or' },
+    { citySlug: 'new-york-ny' },
+    { citySlug: 'austin-tx' },
+    { citySlug: 'seattle-wa' },
+  ]
+}
+
 interface Props {
   params: Promise<{ citySlug: string }>
 }
