@@ -7,6 +7,8 @@ import {
 } from 'lucide-react'
 import { getListingBySlug } from '@/lib/data'
 import { getDisplayName, formatPhone, formatState } from '@/lib/utils'
+import { createServiceClient } from '@/lib/supabase/server'
+import { ViewTracker } from '@/components/ViewTracker'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -39,8 +41,15 @@ export default async function ProviderPage({ params }: Props) {
 
   if (!listing || listing.listing_type !== 'provider') notFound()
 
+  const isClaimed = listing.claimed === true
   const name = getDisplayName(listing)
   const stateName = formatState(listing.state)
+
+  const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
+  const supabase = await createServiceClient()
+  const { count: viewCount } = await supabase.from('listing_views').select('*', { count: 'exact', head: true })
+    .eq('directory_slug', 'eating-disorder-treatment').eq('listing_id', String(listing.id)).gte('viewed_at', monthStart)
+  const monthlyViews = viewCount ?? 0
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -63,6 +72,8 @@ export default async function ProviderPage({ params }: Props) {
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+        <ViewTracker listingId={String(listing.id)} directorySlug="eating-disorder-treatment" />
+
         <Link
           href="/eating-disorder-treatment"
           className="flex items-center gap-1 text-sm text-gray-500 hover:text-brand-plum mb-6"
@@ -134,55 +145,66 @@ export default async function ProviderPage({ params }: Props) {
               )}
             </div>
 
-            {/* CTA buttons */}
-            <div className="flex flex-wrap gap-3">
-              {listing.phone && (
-                <a
-                  href={`tel:${listing.phone}`}
-                  className="btn-primary flex items-center gap-2"
-                >
-                  <Phone className="w-4 h-4" />
-                  {formatPhone(listing.phone)}
+            {/* CTA buttons — gated for unclaimed */}
+            {isClaimed ? (
+              <div className="flex flex-wrap gap-3">
+                {listing.phone && (
+                  <a
+                    href={`tel:${listing.phone}`}
+                    className="btn-primary flex items-center gap-2"
+                  >
+                    <Phone className="w-4 h-4" />
+                    {formatPhone(listing.phone)}
+                  </a>
+                )}
+                {listing.website_url && (
+                  <a
+                    href={listing.website_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-secondary flex items-center gap-2"
+                  >
+                    <Globe className="w-4 h-4" />
+                    Visit Website
+                  </a>
+                )}
+                {listing.email && (
+                  <a
+                    href={`mailto:${listing.email}`}
+                    className="btn-secondary flex items-center gap-2"
+                  >
+                    <Mail className="w-4 h-4" />
+                    Send Email
+                  </a>
+                )}
+              </div>
+            ) : (
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center">
+                <p className="text-sm text-gray-500">Phone, website, and bio are only visible after this provider claims their listing.</p>
+                <a href={`/claim/${listing.id}`} className="mt-2 inline-block text-sm font-medium text-blue-600 hover:underline">
+                  Is this you? Claim your free profile →
                 </a>
-              )}
-              {listing.website_url && (
-                <a
-                  href={listing.website_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-secondary flex items-center gap-2"
-                >
-                  <Globe className="w-4 h-4" />
-                  Visit Website
-                </a>
-              )}
-              {listing.email && (
-                <a
-                  href={`mailto:${listing.email}`}
-                  className="btn-secondary flex items-center gap-2"
-                >
-                  <Mail className="w-4 h-4" />
-                  Send Email
-                </a>
-              )}
-              {!listing.claimed && (
-                <Link
-                  href={`/claim/${listing.id}`}
-                  className="text-sm text-gray-500 hover:text-brand-plum border border-gray-200 px-4 py-2 rounded-lg transition-colors"
-                >
-                  Claim this listing
-                </Link>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
+
+        {/* Monthly views stats (claimed only) */}
+        {isClaimed && (
+          <div className="mb-6 rounded-xl border border-blue-200 bg-blue-50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-blue-600">Profile Activity</p>
+            <p className="mt-1 text-3xl font-bold text-blue-900">{monthlyViews}</p>
+            <p className="text-sm text-blue-700">people viewed your profile this month</p>
+            <p className="mt-2 text-xs text-blue-600">0 could contact you. <a href={`/claim/${listing.id}?upgrade=true`} className="underline font-medium">Upgrade to be reachable →</a></p>
+          </div>
+        )}
 
         {/* Details grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Main column */}
           <div className="md:col-span-2 space-y-6">
-            {/* Bio */}
-            {listing.bio && (
+            {/* Bio — gated for unclaimed */}
+            {isClaimed && listing.bio && (
               <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
                 <h2 className="text-lg font-bold text-brand-charcoal mb-3">About</h2>
                 <p className="text-gray-700 leading-relaxed whitespace-pre-line">{listing.bio}</p>
