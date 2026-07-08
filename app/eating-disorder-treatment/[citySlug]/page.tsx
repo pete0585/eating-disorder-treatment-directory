@@ -23,6 +23,11 @@ export async function generateStaticParams() {
     { citySlug: 'new-york-ny' },
     { citySlug: 'austin-tx' },
     { citySlug: 'seattle-wa' },
+    { citySlug: 'san-francisco-ca' },
+    { citySlug: 'los-angeles-ca' },
+    { citySlug: 'miami-fl' },
+    { citySlug: 'dallas-tx' },
+    { citySlug: 'boston-ma' },
   ]
 }
 
