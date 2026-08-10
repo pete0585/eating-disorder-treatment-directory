@@ -18,7 +18,7 @@ export const revalidate = 86400
 const FAQ = [
   {
     q: 'How much does residential eating disorder treatment cost?',
-    a: 'Residential eating disorder treatment typically costs $1,200–$2,000 per day, or $36,000–$60,000 per month. A standard 30-day residential stay can run $50,000–$90,000 before insurance. These costs reflect 24-hour medical and psychiatric supervision, specialized dietary support, individual and group therapy, and around-the-clock nursing care. With insurance, your out-of-pocket cost depends on your plan's deductible, out-of-pocket maximum, and in-network status of the facility.',
+    a: "Residential eating disorder treatment typically costs $1,200–$2,000 per day, or $36,000–$60,000 per month. A standard 30-day residential stay can run $50,000–$90,000 before insurance. These costs reflect 24-hour medical and psychiatric supervision, specialized dietary support, individual and group therapy, and around-the-clock nursing care. With insurance, your out-of-pocket cost depends on your plan's deductible, out-of-pocket maximum, and in-network status of the facility.",
   },
   {
     q: 'What does outpatient eating disorder treatment cost?',
