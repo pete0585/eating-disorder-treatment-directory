@@ -38,7 +38,7 @@ const FAQ = [
   },
 ]
 
-COST_ROWS = [
+const COST_ROWS = [
   { 'level': 'Individual Therapy (Outpatient)', 'private': '$150–$350/session', 'insurance': 'Copay $30–$80 in-network' },
   { 'level': 'Registered Dietitian (Outpatient)', 'private': '$100–$250/session', 'insurance': 'Often covered under medical benefits' },
   { 'level': 'Psychiatrist (Medication Management)', 'private': '$300–$600 initial, $100–$200 follow-up', 'insurance': 'Specialist copay $40–$100' },
