@@ -119,7 +119,7 @@ export default function BingeEatingDisorderTreatmentPage() {
                 {
                   name: 'Nutrition Rehabilitation',
                   evidence: 'Essential alongside therapy',
-                  detail: 'Working with a registered dietitian who specializes in eating disorders is a core component of BED treatment. The focus is normalized eating (regular meals without restriction), not caloric restriction. Restriction typically worsens the binge cycle — a dietitian trained in eating disorders understands this and won't put you on a diet.',
+                  detail: "Working with a registered dietitian who specializes in eating disorders is a core component of BED treatment. The focus is normalized eating (regular meals without restriction), not caloric restriction. Restriction typically worsens the binge cycle — a dietitian trained in eating disorders understands this and won't put you on a diet.",
                 },
               ].map((item) => (
                 <div key={item.name} className="bg-white border border-gray-200 rounded-xl p-5">
