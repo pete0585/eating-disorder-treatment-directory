@@ -63,8 +63,8 @@ export default async function ProviderPage({ params }: Props) {
       postalCode: listing.zip || undefined,
       addressCountry: 'US',
     },
-    telephone: listing.phone || undefined,
-    url: listing.website_url || undefined,
+    telephone: isClaimed ? (listing.phone || undefined) : undefined,
+    url: isClaimed ? (listing.website_url || undefined) : undefined,
     description: listing.bio || undefined,
     medicalSpecialty: 'PsychiatricCare',
   }
