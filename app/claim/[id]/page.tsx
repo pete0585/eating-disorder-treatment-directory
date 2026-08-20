@@ -22,10 +22,12 @@ export default async function ClaimPage({ params, searchParams }: Props) {
   const { token, verified } = await searchParams
 
   const supabase = await createClient()
+  // Accept either UUID id or slug
+  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)
   const { data: listing, error } = await supabase
     .from('ed_listings')
     .select('*')
-    .eq('id', id)
+    .eq(isUUID ? 'id' : 'slug', id)
     .single()
 
   if (error || !listing) notFound()
@@ -38,7 +40,7 @@ export default async function ClaimPage({ params, searchParams }: Props) {
     const { data: claim } = await supabase
       .from('ed_claims')
       .select('*')
-      .eq('listing_id', id)
+      .eq('listing_id', listing.id)
       .eq('token', token)
       .eq('verified', false)
       .gt('expires_at', new Date().toISOString())
@@ -54,7 +56,7 @@ export default async function ClaimPage({ params, searchParams }: Props) {
           <p className="text-gray-600 mb-6">
             This verification link has expired or already been used. Request a new verification email.
           </p>
-          <a href={`/claim/${id}`} className="btn-primary inline-block">
+          <a href={`/claim/${listing.id}`} className="btn-primary inline-block">
             Request New Link
           </a>
         </div>
@@ -70,13 +72,13 @@ export default async function ClaimPage({ params, searchParams }: Props) {
     await supabase
       .from('ed_listings')
       .update({ claimed: true, claimed_at: new Date().toISOString() })
-      .eq('id', id)
+      .eq('id', listing.id)
 
     // Get monthly views for upgrade page
     const serviceClient = await createServiceClient()
     const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
     const { count: viewCount } = await serviceClient.from('listing_views').select('*', { count: 'exact', head: true })
-      .eq('directory_slug', 'eating-disorder-treatment').eq('listing_id', id).gte('viewed_at', monthStart)
+      .eq('directory_slug', 'eating-disorder-treatment').eq('listing_id', listing.id).gte('viewed_at', monthStart)
     const monthlyViews = viewCount ?? 0
 
     return (
@@ -112,7 +114,7 @@ export default async function ClaimPage({ params, searchParams }: Props) {
         </div>
 
         <a
-          href={`/api/upgrade?listing_id=${id}&tier=verified`}
+          href={`/api/upgrade?listing_id=${listing.id}&tier=verified`}
           className="btn-primary inline-block"
         >
           Upgrade to Verified — $149/yr
@@ -125,7 +127,7 @@ export default async function ClaimPage({ params, searchParams }: Props) {
     const serviceClient = await createServiceClient()
     const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
     const { count: viewCount } = await serviceClient.from('listing_views').select('*', { count: 'exact', head: true })
-      .eq('directory_slug', 'eating-disorder-treatment').eq('listing_id', id).gte('viewed_at', monthStart)
+      .eq('directory_slug', 'eating-disorder-treatment').eq('listing_id', listing.id).gte('viewed_at', monthStart)
     const monthlyViews = viewCount ?? 0
 
     return (
@@ -156,7 +158,7 @@ export default async function ClaimPage({ params, searchParams }: Props) {
         </div>
 
         <a
-          href={`/api/upgrade?listing_id=${id}&tier=verified`}
+          href={`/api/upgrade?listing_id=${listing.id}&tier=verified`}
           className="btn-primary inline-block w-full text-center"
         >
           Upgrade to Verified — $149/yr
@@ -173,7 +175,7 @@ export default async function ClaimPage({ params, searchParams }: Props) {
           Verify you&apos;re the owner of <strong>{name}</strong> to unlock profile editing and upgrade
           options.
         </p>
-        <ClaimForm listingId={id} listingName={name} />
+        <ClaimForm listingId={listing.id} listingName={name} />
       </div>
     </div>
   )
