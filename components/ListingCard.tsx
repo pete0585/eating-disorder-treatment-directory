@@ -9,10 +9,7 @@ interface Props {
 
 export default function ListingCard({ listing }: Props) {
   const name = getDisplayName(listing)
-  const href =
-    listing.listing_type === 'center'
-      ? `/center/${listing.slug}`
-      : `/provider/${listing.slug}`
+  const href = `/listings/${listing.slug}`
 
   return (
     <div className="card p-5 flex flex-col gap-3">
