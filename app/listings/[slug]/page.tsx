@@ -73,7 +73,7 @@ export default async function ListingPage({ params }: Props) {
     <div className="bg-gray-50 min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         <Link
-          href="/listings"
+          href="/eating-disorder-treatment"
           className="flex items-center gap-1 text-sm text-gray-500 hover:text-brand-plum mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
