@@ -47,7 +47,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const centerUrls: MetadataRoute.Sitemap = (listings ?? [])
     .filter((l) => l.listing_type === 'center')
     .map((l) => ({
-      url: `${BASE_URL}/center/${l.slug}`,
+      url: `${BASE_URL}/listings/${l.slug}`,
       lastModified: l.updated_at ? new Date(l.updated_at) : new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.7,
@@ -56,7 +56,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const providerUrls: MetadataRoute.Sitemap = (listings ?? [])
     .filter((l) => l.listing_type === 'provider')
     .map((l) => ({
-      url: `${BASE_URL}/provider/${l.slug}`,
+      url: `${BASE_URL}/listings/${l.slug}`,
       lastModified: l.updated_at ? new Date(l.updated_at) : new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.7,
