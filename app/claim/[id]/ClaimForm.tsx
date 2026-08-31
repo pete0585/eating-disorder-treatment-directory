@@ -11,6 +11,7 @@ export default function ClaimForm({ listingId, listingName }: Props) {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [sent, setSent] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -30,12 +31,26 @@ export default function ClaimForm({ listingId, listingName }: Props) {
         return
       }
 
-      window.location.href = `/claim/${listingId}?verified=true`
+      setSent(true)
     } catch {
       setError('Network error. Please try again.')
     } finally {
       setLoading(false)
     }
+  }
+
+  if (sent) {
+    return (
+      <div className="text-center py-4">
+        <div className="w-16 h-16 bg-brand-teal-light rounded-full flex items-center justify-center mx-auto mb-4">
+          <span className="text-3xl">✓</span>
+        </div>
+        <h2 className="text-xl font-bold text-brand-charcoal mb-2">Check your email</h2>
+        <p className="text-gray-600 leading-relaxed">
+          Check your email for the verification link. It expires in 72 hours.
+        </p>
+      </div>
+    )
   }
 
   return (

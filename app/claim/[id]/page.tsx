@@ -8,18 +8,21 @@ import { EDListing } from '@/lib/types'
 
 interface Props {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ token?: string; verified?: string }>
+  searchParams: Promise<{ token?: string }>
 }
 
-export const metadata: Metadata = {
-  title: 'Claim Your Listing',
-  description: 'Claim and manage your eating disorder practice listing.',
-  alternates: { canonical: '/submit' },
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params
+  return {
+    title: 'Claim Your Listing',
+    description: 'Claim and manage your eating disorder practice listing.',
+    alternates: { canonical: `/claim/${id}` },
+  }
 }
 
 export default async function ClaimPage({ params, searchParams }: Props) {
   const { id } = await params
-  const { token, verified } = await searchParams
+  const { token } = await searchParams
 
   const supabase = await createClient()
   // Accept either UUID id or slug
@@ -116,50 +119,6 @@ export default async function ClaimPage({ params, searchParams }: Props) {
         <a
           href={`/api/upgrade?listing_id=${listing.id}&tier=verified`}
           className="btn-primary inline-block"
-        >
-          Upgrade to Verified — $149/yr
-        </a>
-      </div>
-    )
-  }
-
-  if (verified === 'true') {
-    const serviceClient = await createServiceClient()
-    const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
-    const { count: viewCount } = await serviceClient.from('listing_views').select('*', { count: 'exact', head: true })
-      .eq('directory_slug', 'eating-disorder-treatment').eq('listing_id', listing.id).gte('viewed_at', monthStart)
-    const monthlyViews = viewCount ?? 0
-
-    return (
-      <div className="max-w-lg mx-auto px-4 py-20">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-brand-charcoal mb-2">Upgrade Your Listing</h1>
-          <p className="text-gray-600">Your listing for <strong>{name}</strong> is verified.</p>
-        </div>
-
-        <div className="text-center mb-6">
-          <div className="text-5xl font-bold text-gray-900">{monthlyViews}</div>
-          <div className="text-gray-500 mt-1">people viewed your profile this month</div>
-          <div className="mt-3 text-red-600 font-semibold">0 could contact you — your phone and website are hidden</div>
-        </div>
-
-        <div className="space-y-3 mb-6 text-left">
-          {([
-            ['Your phone number visible to searchers', 'They can call you directly'],
-            ['Your website linked', 'Drive traffic to your practice site'],
-            ['Your full bio displayed', 'Build trust before they reach out'],
-            ['Verified badge', 'Stand out from unclaimed profiles'],
-          ] as [string, string][]).map(([title, sub]) => (
-            <div key={title} className="flex items-start gap-3">
-              <span className="text-green-500 text-lg">✓</span>
-              <div><div className="font-medium">{title}</div><div className="text-sm text-gray-500">{sub}</div></div>
-            </div>
-          ))}
-        </div>
-
-        <a
-          href={`/api/upgrade?listing_id=${listing.id}&tier=verified`}
-          className="btn-primary inline-block w-full text-center"
         >
           Upgrade to Verified — $149/yr
         </a>
