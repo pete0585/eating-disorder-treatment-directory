@@ -20,7 +20,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Environment Variables
 
-Copy `.env.example` to `.env.local` and fill in:
+Copy `.env.example` to `.env.local` for local work. Production values live in **Vercel → Project → Settings → Environment Variables**. Do not commit live `whsec_`, `sk_`, JWT, or IndexNow values.
 
 | Variable | Source |
 |---|---|
@@ -28,14 +28,13 @@ Copy `.env.example` to `.env.local` and fill in:
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key |
 | `NEXT_PUBLIC_SITE_URL` | `https://eatingdisordertreatmentfinder.com` |
-| `STRIPE_SECRET_KEY` | Stripe secret key |
-| `STRIPE_WEBHOOK_SECRET` | From bootstrap: `whsec_fb1aw13GWh5YD5L2fBJ8JU5UsMn9X5JI` |
-| `STRIPE_VERIFIED_PRICE_ID` | `price_1TeHMIGzK9Sibluei2rB8p9G` ($149/yr) |
-| `STRIPE_FEATURED_PRICE_ID` | `price_1TeHMIGzK9SiblueKF6y2Mxi` ($299/yr) |
-| `RESEND_API_KEY` | From bootstrap or Resend dashboard |
+| `STRIPE_SECRET_KEY` | Stripe secret key (Dashboard → API keys) |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret (`whsec_REPLACE_ME`) — set in Vercel, never commit |
+| `STRIPE_VERIFIED_PRICE_ID` | `price_REPLACE_ME` ($149/yr) — set in Vercel |
+| `STRIPE_FEATURED_PRICE_ID` | `price_REPLACE_ME` ($299/yr) — set in Vercel |
+| `RESEND_API_KEY` | Resend dashboard |
 | `RESEND_FROM_EMAIL` | `hello@mail.eatingdisordertreatmentfinder.com` |
-
-**All env vars are already set in Vercel** — the bootstrap agent set them via API. No manual configuration needed.
+| `INDEXNOW_KEY` | IndexNow key — set in Vercel only; do not commit |
 
 ---
 
@@ -81,9 +80,10 @@ Custom domains already configured:
 
 ## Stripe Setup
 
-Stripe products already created by bootstrap:
-- **Verified listing**: `prod_UdYS5qfnorV19d` → `price_1TeHMIGzK9Sibluei2rB8p9G` ($149/yr)
-- **Featured listing**: `prod_UdYStRH3ROBQ2Y` → `price_1TeHMIGzK9SiblueKF6y2Mxi` ($299/yr)
+Stripe products already created by bootstrap. Use the live Price IDs from the Stripe Dashboard (or Vercel env vars); do not commit them:
+
+- **Verified listing**: $149/yr — set `STRIPE_VERIFIED_PRICE_ID` to `price_REPLACE_ME`
+- **Featured listing**: $299/yr — set `STRIPE_FEATURED_PRICE_ID` to `price_REPLACE_ME`
 
 Webhook endpoint: `https://www.eatingdisordertreatmentfinder.com/api/webhooks/stripe`  
 Events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_failed`
@@ -101,11 +101,11 @@ Inbound webhook: `https://www.eatingdisordertreatmentfinder.com/api/inbound-emai
 
 ## IndexNow
 
-Key: `19ee5bf9d3f45c1fc7c92969d2281df9`
+The live IndexNow key is **not stored in git**. It lives in the Vercel env var `INDEXNOW_KEY`, and Bing/IndexNow expect a matching verification file at `public/{key}.txt` (also not committed).
 
-Submit sitemap after launch:
+Submit sitemap after launch (replace the placeholder with the value from Vercel):
 ```bash
-curl "https://api.indexnow.org/indexnow?url=https://eatingdisordertreatmentfinder.com/sitemap.xml&key=19ee5bf9d3f45c1fc7c92969d2281df9"
+curl "https://api.indexnow.org/indexnow?url=https://eatingdisordertreatmentfinder.com/sitemap.xml&key=REPLACE_ME"
 ```
 
 ---
