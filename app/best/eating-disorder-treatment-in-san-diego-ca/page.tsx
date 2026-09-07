@@ -3,12 +3,13 @@ import Link from 'next/link'
 import { MapPin, ArrowRight } from 'lucide-react'
 import ListingCard from '@/components/ListingCard'
 import { getListingsByCity } from '@/lib/data'
+import { bestCityCanonical } from '@/lib/best-city-pages'
 
 export const metadata: Metadata = {
   title: 'Best Eating Disorder Treatment in San Diego, CA — Top Therapists & Programs',
   description:
     'Find top-rated eating disorder therapists, dietitians, and treatment programs in San Diego, California. 42+ providers covering all disorder types and levels of care.',
-  alternates: { canonical: '/best/eating-disorder-treatment-in-san-diego-ca' },
+  alternates: { canonical: bestCityCanonical('eating-disorder-treatment-in-san-diego-ca') },
   openGraph: {
     title: 'Best Eating Disorder Treatment in San Diego, CA',
     description:

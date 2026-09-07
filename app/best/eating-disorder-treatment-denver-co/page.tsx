@@ -1,10 +1,12 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
+import { bestCityCanonical } from "@/lib/best-city-pages"
 
 export const metadata: Metadata = {
   title: "Best Eating Disorder Treatment in Denver, CO | Eating Disorder Treatment Directory",
   description: "Find eating disorder treatment in Denver, Colorado. 42+ listed. Filter by city and compare providers.",
+  alternates: { canonical: bestCityCanonical("eating-disorder-treatment-denver-co") },
 }
 
 async function getListings() {

@@ -3,12 +3,13 @@ import Link from 'next/link'
 import { MapPin, ArrowRight } from 'lucide-react'
 import ListingCard from '@/components/ListingCard'
 import { getListingsByCity } from '@/lib/data'
+import { bestCityCanonical } from '@/lib/best-city-pages'
 
 export const metadata: Metadata = {
   title: 'Best Eating Disorder Treatment in Denver, CO — Top Therapists & Programs',
   description:
     'Find top-rated eating disorder therapists, dietitians, and treatment programs in Denver, Colorado. 49+ providers covering all disorder types and levels of care.',
-  alternates: { canonical: '/best/eating-disorder-treatment-in-denver-co' },
+  alternates: { canonical: bestCityCanonical('eating-disorder-treatment-in-denver-co') },
   openGraph: {
     title: 'Best Eating Disorder Treatment in Denver, CO',
     description:
