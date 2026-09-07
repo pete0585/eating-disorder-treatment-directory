@@ -1,10 +1,12 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
+import { bestCityCanonical } from "@/lib/best-city-pages"
 
 export const metadata: Metadata = {
   title: "Best Eating Disorder Treatment in Houston, TX | Eating Disorder Treatment Directory",
   description: "Find eating disorder treatment in Houston, Texas. 41+ listed. Filter by city and compare providers.",
+  alternates: { canonical: bestCityCanonical("eating-disorder-treatment-houston-tx") },
 }
 
 async function getListings() {

@@ -3,12 +3,13 @@ import Link from 'next/link'
 import { MapPin, ArrowRight } from 'lucide-react'
 import ListingCard from '@/components/ListingCard'
 import { getListingsByCity } from '@/lib/data'
+import { bestCityCanonical } from '@/lib/best-city-pages'
 
 export const metadata: Metadata = {
   title: 'Best Eating Disorder Treatment in Houston, TX — Top Therapists & Programs',
   description:
     'Find top-rated eating disorder therapists, dietitians, and treatment programs in Houston, Texas. Spanish-speaking providers, LGBTQ+-affirming care, and Texas Medical Center programs.',
-  alternates: { canonical: '/best/eating-disorder-treatment-in-houston-tx' },
+  alternates: { canonical: bestCityCanonical('eating-disorder-treatment-in-houston-tx') },
   openGraph: {
     title: 'Best Eating Disorder Treatment in Houston, TX',
     description:

@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  outputFileTracingIncludes: {
+    '/sitemap.xml': ['./app/best/**/*'],
+    '/sitemap': ['./app/best/**/*'],
+  },
 }
 
 export default nextConfig

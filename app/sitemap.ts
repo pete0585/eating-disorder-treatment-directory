@@ -2,8 +2,9 @@ import { MetadataRoute } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { getCities } from '@/lib/data'
 import { DISORDERS, LEVELS_OF_CARE } from '@/lib/utils'
+import { getBestCityPageSlugs, getSiteUrl } from '@/lib/best-city-pages'
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://eatingdisordertreatmentfinder.com'
+const BASE_URL = getSiteUrl()
 
 export const dynamic = 'force-dynamic'
 
@@ -29,6 +30,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     }
   })
+
+  const bestCityUrls = getBestCityPageSlugs().map((slug) => ({
+    url: `${BASE_URL}/best/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }))
 
   const disorderUrls = DISORDERS.map((d) => ({
     url: `${BASE_URL}/disorder/${d.slug}`,
@@ -82,6 +90,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.5,
     },
     ...cityUrls,
+    ...bestCityUrls,
     ...disorderUrls,
     ...locUrls,
     ...centerUrls,
