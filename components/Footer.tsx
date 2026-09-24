@@ -68,7 +68,6 @@ export default function Footer() {
             <h3 className="font-semibold text-white mb-4">For Providers</h3>
             <ul className="space-y-2 text-sm">
               <li><Link href="/submit" className="hover:text-white transition-colors">Add Your Listing</Link></li>
-              <li><Link href="/submit" className="hover:text-white transition-colors">Upgrade to Verified</Link></li>
               <li><Link href="/eating-disorder-treatment" className="hover:text-white transition-colors">Browse All Providers</Link></li>
               <li><Link href="/admin" className="hover:text-white transition-colors">Admin</Link></li>
             </ul>
