@@ -32,13 +32,21 @@ export default async function HomePage() {
             Finding specialized care shouldn&apos;t be this hard. We built this so it isn&apos;t.
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-brand-charcoal leading-tight mb-5">
-            Find an eating disorder specialist{' '}
-            <span className="text-brand-plum">who actually gets it</span>
+            Find trusted eating disorder treatment near you
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8 leading-relaxed">
-            Therapists, dietitians, psychiatrists, and treatment centers — specialized in anorexia,
-            bulimia, BED, ARFID, and more. Filter by level of care, community served, and
-            insurance. Real specialists, not a general psychology directory.
+            Browse verified therapists, dietitians, and treatment centers by specialty and level of care — and connect directly. Free, always.
+          </p>
+          <p className="text-sm text-gray-500 mt-4">
+            Are you a eating disorder specialist?{' '}
+            <a
+              href="https://studiozerohq.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:opacity-80"
+            >
+              List your practice free →
+            </a>
           </p>
 
           <Suspense>
