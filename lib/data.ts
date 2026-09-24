@@ -137,7 +137,6 @@ export async function getFeaturedListings(limit = 6): Promise<EDListing[]> {
     .select('*')
     .eq('is_active', true)
     .eq('is_approved', true)
-    .eq('listing_tier', 'featured')
     .order('created_at', { ascending: false })
     .limit(limit)
 
