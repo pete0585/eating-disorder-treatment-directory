@@ -6,6 +6,7 @@ import SearchBar from '@/components/SearchBar'
 import ListingCard from '@/components/ListingCard'
 import { getFeaturedListings, getRecentListings, getCityCount, getTotalCount } from '@/lib/data'
 import { DISORDERS, LEVELS_OF_CARE } from '@/lib/utils'
+import NewsletterSignup from '@/components/NewsletterSignup'
 
 export const metadata: Metadata = {
   title: 'Eating Disorder Treatment Finder — Find Specialized Care Near You',
@@ -231,6 +232,11 @@ export default async function HomePage() {
             </Link>
           </div>
         </div>
+      </section>
+
+      {/* Newsletter signup */}
+      <section className="py-12 px-4">
+        <NewsletterSignup />
       </section>
     </>
   )
