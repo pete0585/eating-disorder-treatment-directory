@@ -1,159 +1,46 @@
-import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
-import ClaimForm from './ClaimForm'
-import { createClient } from '@/lib/supabase/server'
-import { createServiceClient } from '@/lib/supabase/server'
-import { getDisplayName } from '@/lib/utils'
-import { EDListing } from '@/lib/types'
+'use client'
 
-interface Props {
-  params: Promise<{ id: string }>
-  searchParams: Promise<{ token?: string }>
-}
+import { Suspense, useState } from 'react'
+import { useParams, useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params
-  return {
-    title: 'Claim Your Listing',
-    description: 'Claim and manage your eating disorder practice listing.',
-    alternates: { canonical: `/claim/${id}` },
+function ClaimForm() {
+  const { id } = useParams<{ id: string }>()
+  const token = useSearchParams().get('token')
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [verified, setVerified] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
+  async function submit(path: string, body: object, success: string) {
+    setBusy(true); setError(''); setMessage('')
+    try {
+      const response = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      const data = await response.json()
+      if (!response.ok || !data.success) throw new Error(data.error || 'The request was not completed.')
+      if (path.endsWith('/verify')) {
+        setVerified(true)
+        window.history.replaceState(null, '', `/claim/${id}`)
+      }
+      setMessage(success)
+    } catch (e) { setError(e instanceof Error ? e.message : 'The request failed. Please retry.') }
+    finally { setBusy(false) }
   }
+  return <main className="mx-auto max-w-lg px-6 py-16">
+    <h1 className="text-3xl font-bold mb-4">{verified ? 'Manage your listing' : 'Claim your listing'}</h1>
+    <p className="mb-6">Verify the contact email already recorded for your listing. If that email is missing or outdated, contact directory support for an ownership review.</p>
+    {error && <p role="alert" className="rounded border border-red-300 bg-red-50 text-red-900 p-4 mb-4">{error}</p>}
+    {message && <p role="status" className="rounded border border-green-300 bg-green-50 text-green-900 p-4 mb-4">{message}</p>}
+    {verified ? <form className="space-y-4" onSubmit={e => { e.preventDefault(); void submit('/api/claim/phone', { listingId: id, phone }, 'Phone number saved and verified.') }}>
+      <label className="block">Public phone number<input className="block w-full border rounded p-3 mt-2" type="tel" required maxLength={40} value={phone} onChange={e => setPhone(e.target.value)} /></label>
+      <button disabled={busy} className="rounded bg-slate-900 text-white px-5 py-3 disabled:opacity-50">{busy ? 'Saving…' : 'Save phone number'}</button>
+    </form> : token ? <button disabled={busy} className="rounded bg-slate-900 text-white px-5 py-3 disabled:opacity-50" onClick={() => void submit('/api/claim/verify', { listingId: id, token }, 'Ownership verified. You can now update your phone number.')}>{busy ? 'Verifying…' : 'Confirm ownership'}</button> : <form className="space-y-4" onSubmit={e => { e.preventDefault(); void submit('/api/claim', { listingId: id, email }, 'Verification email accepted. Check your inbox for the confirmation link.') }}>
+      <label className="block">Listing contact email<input className="block w-full border rounded p-3 mt-2" type="email" required value={email} onChange={e => setEmail(e.target.value)} /></label>
+      <button disabled={busy} className="rounded bg-slate-900 text-white px-5 py-3 disabled:opacity-50">{busy ? 'Requesting…' : 'Send verification email'}</button>
+    </form>}
+    <Link className="block mt-8 underline" href="/">Return to directory</Link>
+  </main>
 }
 
-export default async function ClaimPage({ params, searchParams }: Props) {
-  const { id } = await params
-  const { token } = await searchParams
-
-  const supabase = await createClient()
-  // Accept either UUID id or slug
-  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)
-  const { data: listing, error } = await supabase
-    .from('ed_listings')
-    .select('*')
-    .eq(isUUID ? 'id' : 'slug', id)
-    .single()
-
-  if (error || !listing) notFound()
-
-  const typedListing = listing as EDListing
-  const name = getDisplayName(typedListing)
-
-  // Handle token verification
-  if (token) {
-    const { data: claim } = await supabase
-      .from('ed_claims')
-      .select('*')
-      .eq('listing_id', listing.id)
-      .eq('token', token)
-      .eq('verified', false)
-      .gt('expires_at', new Date().toISOString())
-      .single()
-
-    if (!claim) {
-      return (
-        <div className="max-w-lg mx-auto px-4 py-20 text-center">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-3xl">✗</span>
-          </div>
-          <h1 className="text-2xl font-bold text-brand-charcoal mb-3">Link Expired or Invalid</h1>
-          <p className="text-gray-600 mb-6">
-            This verification link has expired or already been used. Request a new verification email.
-          </p>
-          <a href={`/claim/${listing.id}`} className="btn-primary inline-block">
-            Request New Link
-          </a>
-        </div>
-      )
-    }
-
-    // Mark claim verified
-    await supabase
-      .from('ed_claims')
-      .update({ verified: true, verified_at: new Date().toISOString() })
-      .eq('id', claim.id)
-
-    await supabase
-      .from('ed_listings')
-      .update({ claimed: true, claimed_at: new Date().toISOString() })
-      .eq('id', listing.id)
-
-    // Get monthly views for upgrade page
-    const serviceClient = await createServiceClient()
-    const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
-    const { count: viewCount } = await serviceClient.from('listing_views').select('*', { count: 'exact', head: true })
-      .eq('directory_slug', 'eating-disorder-treatment').eq('listing_id', listing.id).gte('viewed_at', monthStart)
-    const monthlyViews = viewCount ?? 0
-
-    return (
-      <div className="max-w-lg mx-auto px-4 py-20 text-center">
-        <div className="w-16 h-16 bg-brand-teal-light rounded-full flex items-center justify-center mx-auto mb-4">
-          <span className="text-3xl">✓</span>
-        </div>
-        <h1 className="text-2xl font-bold text-brand-charcoal mb-3">
-          Listing Claimed Successfully!
-        </h1>
-        <p className="text-gray-600 mb-6">
-          You&apos;ve verified ownership of <strong>{name}</strong>.
-        </p>
-
-        <div className="text-center mb-6">
-          <div className="text-5xl font-bold text-gray-900">{monthlyViews}</div>
-          <div className="text-gray-500 mt-1">people viewed your profile this month</div>
-          <div className="mt-3 text-red-600 font-semibold">0 could contact you — your phone and website are hidden</div>
-        </div>
-
-        <div className="space-y-3 mb-6 text-left">
-          {([
-            ['Your phone number visible to searchers', 'They can call you directly'],
-            ['Your website linked', 'Drive traffic to your practice site'],
-            ['Your full bio displayed', 'Build trust before they reach out'],
-            ['Verified badge', 'Stand out from unclaimed profiles'],
-          ] as [string, string][]).map(([title, sub]) => (
-            <div key={title} className="flex items-start gap-3">
-              <span className="text-green-500 text-lg">✓</span>
-              <div><div className="font-medium">{title}</div><div className="text-sm text-gray-500">{sub}</div></div>
-            </div>
-          ))}
-        </div>
-
-        {/* Studio Zero upsell */}
-        <div className="rounded-xl bg-blue-50 border border-blue-200 p-5 mb-6">
-          <h2 className="text-base font-semibold text-blue-900 mb-1">
-            Want to attract more patients?
-          </h2>
-          <p className="text-sm text-blue-700 mb-3">
-            Studio Zero helps healthcare providers grow their practice with AI-powered marketing — content, SEO, and visibility that compounds over time.
-          </p>
-          <a
-            href="https://studiozerohq.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block text-sm font-medium text-blue-700 underline hover:opacity-80"
-          >
-            Learn more at Studio Zero →
-          </a>
-        </div>
-
-        <a
-          href={`/api/upgrade?listing_id=${listing.id}&tier=verified`}
-          className="btn-primary inline-block"
-        >
-          Upgrade to Verified — $149/yr
-        </a>
-      </div>
-    )
-  }
-
-  return (
-    <div className="max-w-lg mx-auto px-4 py-16">
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
-        <h1 className="text-2xl font-bold text-brand-charcoal mb-2">Claim Your Listing</h1>
-        <p className="text-gray-600 mb-6">
-          Verify you&apos;re the owner of <strong>{name}</strong> to unlock profile editing and upgrade
-          options.
-        </p>
-        <ClaimForm listingId={listing.id} listingName={name} />
-      </div>
-    </div>
-  )
-}
+export default function ClaimPage() { return <Suspense fallback={<p className="p-8">Loading claim…</p>}><ClaimForm /></Suspense> }
