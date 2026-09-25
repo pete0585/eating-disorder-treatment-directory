@@ -7,7 +7,7 @@ const NICHE = 'eating-disorder' as const
 const DIRECTORY_SLUG = 'eating-disorder-treatment-directory' as const
 const NEWSLETTER_NAME = 'The Gentle Recovery Dispatch' as const
 const CONFIRM_URL_BASE = 'https://www.eatingdisordertreatmentfinder.com/newsletter/confirm'
-const DASHBOARD_URL = 'https://aidam.thestrategicveteran.com'
+const DASHBOARD_URL = 'https://aidam.studiozerohq.com'
 
 export async function POST(req: NextRequest) {
   let email: string, first_name: string | undefined
