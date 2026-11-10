@@ -117,7 +117,7 @@ export default async function ListingPage({ params }: Props) {
                     <Phone className="w-4 h-4"/>
                     {formatPhone(listing.phone)}
                   </a>)}
-                {listing.website_url && (<a href={listing.website_url} target="_blank" rel="noopener noreferrer" className="btn-secondary flex items-center gap-2">
+                {listing.website_url && (<a data-directory-action="website_click" href={listing.website_url} target="_blank" rel="noopener noreferrer" className="btn-secondary flex items-center gap-2">
                     <Globe className="w-4 h-4"/>
                     Visit Website
                   </a>)}
