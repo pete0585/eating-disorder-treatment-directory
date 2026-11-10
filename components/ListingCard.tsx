@@ -111,7 +111,7 @@ export default function ListingCard({ listing }: Props) {
           )}
           {listing.website_url && (
             <a
-              href={listing.website_url}
+              data-directory-action="website_click" href={listing.website_url}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1 text-xs text-gray-500 hover:text-brand-plum transition-colors"
